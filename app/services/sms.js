@@ -1,48 +1,37 @@
 'use strict';
 
 var Sms = function() {
-  var fs = require('fs'),
-    cellact = require('../../config/cellact.js'),
-    url = require('../../config/url.js').confirmUrl,
+  var cellact = require('../../config/cellact.js'),
+    url = require('../../config/url.js'),
     File = require('./file.js'),
     Curl = require( 'node-libcurl' ).Curl,
     moment = require('moment'),
     mongoose = require('mongoose-promised'),
-    Template = mongoose.model('Template');
+    Promise = require('bluebird');
 
   /**
     * Send sms
     * @param recipient
-    * @param contentType
+    * @param content
     * @param confirmUrl
-    * @param paramList
   */
-  var send = function(recipient, contentType, paramList, confirmUrl) {
-    confirmUrl = confirmUrl || url;
-    return getContent(contentType, paramList)
-      .then(function(content) {
-        var XMLString = '<PALO>' +
-          '<HEAD>' +
-          '<FROM>' + cellact.company + '</FROM>' +
-          '<APP USER="' + cellact.user + '" PASSWORD="' + cellact.password + '">' + cellact.app + '</APP>' +
-          '<CMD>sendtextmt</CMD>' +
-          '<CONF_LIST><TO TECH="post">' + confirmUrl + '</TO></CONF_LIST>' +
-          '</HEAD>' +
-          '<BODY>' +
-          '<SENDER>' + cellact.sender + '</SENDER>' +
-          '<CONTENT><![CDATA[' + content + ']]></CONTENT>' +
-          '<DEST_LIST><TO>' + recipient + '</TO></DEST_LIST>' +
-          '</BODY>' +
-          '<OPTIONAL><MSG_ID>1123527</MSG_ID></OPTIONAL>' +
-          '</PALO>';
-        return doPostRequestCURL(XMLString)
-      })
-      .then(function(res){
-        return res;
-      })
-      .catch(function(err) {
-        return err;
-      });
+  var send = function(recipient, content, confirmUrl) {
+    confirmUrl = confirmUrl || url.confirmUrl;
+    var XMLString = '<PALO>' +
+      '<HEAD>' +
+      '<FROM>' + cellact.company + '</FROM>' +
+      '<APP USER="' + cellact.user + '" PASSWORD="' + cellact.password + '">' + cellact.app + '</APP>' +
+      '<CMD>sendtextmt</CMD>' +
+      '<CONF_LIST><TO TECH="post">' + confirmUrl + '</TO></CONF_LIST>' +
+      '</HEAD>' +
+      '<BODY>' +
+      '<SENDER>' + cellact.sender + '</SENDER>' +
+      '<CONTENT><![CDATA[' + content + ']]></CONTENT>' +
+      '<DEST_LIST><TO>' + recipient + '</TO></DEST_LIST>' +
+      '</BODY>' +
+      '<OPTIONAL><MSG_ID>1123527</MSG_ID></OPTIONAL>' +
+      '</PALO>';
+    return doPostRequestCURL(XMLString)
   };
 
   /**
@@ -62,7 +51,10 @@ var Sms = function() {
         var message = moment().format() + ': ' + statusCode + ' ' + body;
         File.writeToFile('/sms-send.log', message);
         this.close();
-        resolve(true);
+        var response = {};
+        response['statusCode'] = statusCode;
+        response['body'] = body;
+        resolve(response);
       });
       curl.on('error', function(err, errCode) {
         File.writeToFile('/sms-send.log', err.message);
@@ -73,29 +65,8 @@ var Sms = function() {
     });
   };
 
-  /**
-   * Get content for sms by contentType
-   * @param contentType
-   * @param paramList
-   * @returns {Promise.<T>}
-   */
-  var getContent = function(contentType, paramList) {
-    return Template.where({name: contentType})
-      .findOneQ()
-      .then(function (template){
-        for(var index in paramList) {
-          var re = new RegExp("%"+index+"%","g");
-          template.text = template.text.replace(re, paramList[index]);
-        }
-        return template.text;
-      })
-      .catch(function (err) {
-        return err;
-      });
-  };
-
   return {
-    send : send
+    send: send
   }
 }();
 

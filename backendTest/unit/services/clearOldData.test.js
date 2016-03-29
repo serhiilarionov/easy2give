@@ -2,12 +2,13 @@
 
 var mongoose = require('mongoose-promised'),
   moment = require('moment'),
+  dateFormats = require('../../../config/dateFormats'),
   TestData = require('../testingData/testData.js'),
   ClearOldData = require('../../../app/services/clearOldData.js'),
   expect = require('chai').expect,
   model;
 
-describe('Sms service', function () {
+describe('Clear old data service', function () {
   before(function(done) {
     mongoose.connectQ(TestData.dbPath)
       .then(function(){
@@ -24,11 +25,11 @@ describe('Sms service', function () {
       .catch(done);
   });
 
-  it('expect send sms', function (done) {
-    var now = moment().format();
-    ClearOldData('Error', now)
+  it('expect clear old data', function (done) {
+    var now = moment().subtract(7,'d').format(dateFormats.format);
+    ClearOldData(TestData.modelName, now)
       .then(function(){
-        return model.where({created_at: {"$lt": now}}).findQ()
+        return model.where({createdAt: {"$lt": now}}).findQ()
       })
       .then(function(res) {
         expect(res).to.be.an('array');
@@ -39,7 +40,15 @@ describe('Sms service', function () {
   });
 
   after(function(done) {
-    mongoose.connection.close();
-    done();
+    model
+      .where({
+        _id: TestData[TestData.modelName].id
+      })
+      .removeQ()
+      .then(function() {
+        mongoose.connection.close();
+        done();
+      })
+      .catch(done);
   });
 });

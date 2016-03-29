@@ -2,7 +2,8 @@
 
 var mongoose = require('mongoose-promised'),
   TestData = require('../testingData/testData.js'),
-  Template = require('../../../app/models/template.js'),
+  Template = mongoose.model('Template'),
+  SmsQueue = require('../../../app/models/smsQueue.js'),
   Sms = require('../../../app/services/sms.js'),
   expect = require('chai').expect;
 
@@ -10,7 +11,7 @@ describe('Sms service', function () {
   before(function(done) {
     mongoose.connectQ(TestData.dbPath)
       .then(function(){
-        return new Template.model(TestData.Sms.Template).saveQ()
+        return new Template(TestData.Sms.Template).saveQ()
       })
       .then(function (template) {
         TestData.Sms.Template.id = template[0]._id;
@@ -20,16 +21,21 @@ describe('Sms service', function () {
   });
 
   it('expect send sms', function (done) {
-    Sms.send(TestData.Sms.phoneNumber, TestData.Sms.Template.name, TestData.paramList)
+    var _Template = new Template();
+    _Template.getContent(TestData.Sms.Template.name, TestData.paramList)
+      .then(function(template) {
+        return Sms.send(TestData.Sms.phoneNumber, template);
+      })
       .then(function(res){
-        expect(res).to.be.true;
+        expect(res).to.be.a('object');
+        expect(res).to.have.all.keys('statusCode', 'body');
         done();
       })
       .catch(done);
   });
 
   after(function(done) {
-    Template.model
+    Template
       .where({
         _id: TestData.Sms.Template.id
       })

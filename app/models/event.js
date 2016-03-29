@@ -3,6 +3,7 @@
 var Event = function(){
   var moment = require('moment'),
     mongoose = require('mongoose-promised'),
+    dateFormats = require('../../config/dateFormats.js'),
     Schema = mongoose.Schema;
 
   //scheme of Event model
@@ -14,34 +15,35 @@ var Event = function(){
     smsRemindText : {type: String},
     isInstructionSent : {type: Boolean},
     isLimitWaves : {type: Boolean},
+    smsAllowed : {type: Boolean},
     callCenter : {type: Date},
     firstWave : {type: Date},
     secondWave : {type: Date},
     ivrDate : {type: Date},
+    groomPhone : {type: String},
+    bridePhone : {type: String},
+    eventStatus: {type: Number},
     coupleId : {type: String, require: true, index: { unique: true }},
-    password : {type: String, require: true, index: { unique: true }},
-    created_at: {type: Date},
-    updated_at: {type: Date}
+    password : {type: String, require: true},
+    createdAt: {type: Date},
+    updatedAt: {type: Date}
   });
 
   EventScheme.pre('save', function(next) {
     // get the current date
-    var currentDate = moment().format();
+    var currentDate = moment().format(dateFormats.format);
 
-    // change the updated_at field to current date
-    this.updated_at = currentDate;
+    // change the updatedAt field to current date
+    this.updatedAt = currentDate;
 
-    // if created_at doesn't exist, add to that field
-    if (!this.created_at)
-      this.created_at = currentDate;
+    // if createdAt doesn't exist, add to that field
+    if (!this.createdAt)
+      this.createdAt = currentDate;
 
     next();
   });
   //the model uses the schema declaration
   var _model = mongoose.model('Event', EventScheme, "Event");
-  //var Test = new _model({coupleId:'test', password:'test'});
-  //Test.save();
-
 
   return {
     schema : EventScheme,

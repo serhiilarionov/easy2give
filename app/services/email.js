@@ -5,6 +5,8 @@ var Email = function() {
     emailConfig = require('../../config/email.js'),
     moment = require('moment'),
     nodemailer = require('nodemailer'),
+    mongoose = require('mongoose-promised'),
+    ErrorLog = mongoose.model('Error'),
     Template = require('../services/template.js'),
     Promise = require('bluebird');
 
@@ -37,7 +39,12 @@ var Email = function() {
         return true;
       })
       .catch(function(err){
-        File.writeToFile('/email-send.log', err.message);
+        new ErrorLog({
+          errorStatus: err.status || 500,
+          errorMessage: err.message,
+          error: err
+        }).save();
+        File.writeToFile('/error.log', err.message);
         return err;
       });
   };

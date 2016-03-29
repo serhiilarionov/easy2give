@@ -19,7 +19,6 @@
     "glob": "^6.0.4",
     "gulp-mocha": "^2.2.0",
     "method-override": "^2.3.0",
-    "mockgoose": "^5.3.3",
     "moment": "^2.12.0",
     "mongoose-promised": "^0.1.0",
     "morgan": "^1.6.1",

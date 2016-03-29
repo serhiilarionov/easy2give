@@ -2,6 +2,7 @@
 
 var ErrorLog = function(){
   var moment = require('moment'),
+    dateFormats = require('../../config/dateFormats.js'),
     mongoose = require('mongoose-promised'),
     Schema = mongoose.Schema;
 
@@ -10,28 +11,26 @@ var ErrorLog = function(){
     errorStatus: {type: Number},
     errorMessage: {type: String},
     error: {type: String},
-    created_at: {type: Date},
-    updated_at: {type: Date}
+    createdAt: {type: Date},
+    updatedAt: {type: Date}
   });
 
   ErrorScheme.pre('save', function(next) {
     // get the current date
-    var currentDate = moment().format();
+    var currentDate = moment().format(dateFormats.format);
 
-    // change the updated_at field to current date
-    this.updated_at = currentDate;
+    // change the updatedAt field to current date
+    this.updatedAt = currentDate;
 
-    // if created_at doesn't exist, add to that field
-    if (!this.created_at)
-      this.created_at = currentDate;
+    // if createdAt doesn't exist, add to that field
+    if (!this.createdAt)
+      this.createdAt = currentDate;
 
     next();
   });
 
   //the model uses the schema declaration
   var _model = mongoose.model('Error', ErrorScheme, "Error");
-  //var Test = new _model({contentId: 'test', contentType:'test', error:'test'});
-  //Test.save();
 
   return {
     schema : ErrorScheme,

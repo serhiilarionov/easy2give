@@ -1,7 +1,9 @@
 'use strict';
 
 var Template = function() {
-  var File = require('./file.js');
+  var File = require('./file.js'),
+    mongoose = require('mongoose-promised'),
+    ErrorLog = mongoose.model('Error');
 
   /**
    * Get template and prepare text for sending
@@ -19,6 +21,12 @@ var Template = function() {
         return template;
       })
       .catch(function(err) {
+        new ErrorLog({
+          errorStatus: err.status || 500,
+          errorMessage: err.message,
+          error: err
+        }).save();
+        File.writeToFile('/error.log', err.message);
         return err;
       })
   };

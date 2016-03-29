@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Send email
+ * Clear old data from select db
  * @param date
  * @param modelName
  */
@@ -11,9 +11,11 @@ var clear = function(modelName, date) {
     File = require('./file.js'),
     Promise = require('bluebird'),
     async = require('async');
-
+  if(model !== 'Error') {
+    var ErrorLog = mongoose.model('Error');
+  }
   //get data for clearing
-  return model.where({created_at: {"$lt": date}})
+  return model.where({createdAt: {"$lt": date}})
     .findQ()
     .then(function (items){
       var portions = [];
@@ -22,7 +24,7 @@ var clear = function(modelName, date) {
         portions.push(items.splice(0, 1000));
       }
 
-      //remove all the old data asynchronosly by the 100 rows
+      //remove all the old data by the 1000 rows
       async.eachSeries(portions, function (portion, cb) {
         var portionPromises = [];
         portion.forEach(function (item) {
@@ -36,19 +38,29 @@ var clear = function(modelName, date) {
         //handling all responses from all removals
         Promise.all(portionPromises)
           .then(function (res) {
-            return cb(new Error('error'));
+            return cb();
           })
           .catch(function (err) {
             return cb(err);
           });
       }, function (err) {
         if (err) {
+          new ErrorLog({
+            errorStatus: err.status || 500,
+            errorMessage: err.message,
+            error: err
+          }).save();
           File.writeToFile('/error.log', err.message);
         }
       });
-
     })
     .catch(function (err) {
+      new ErrorLog({
+        errorStatus: err.status || 500,
+        errorMessage: err.message,
+        error: err
+      }).save();
+      File.writeToFile('/error.log', err.message);
       return err;
     });
 };

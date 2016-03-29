@@ -21,8 +21,7 @@ describe('Event model', function () {
   it('expect create the event', function (done) {
     Event.model
       .where({
-        password: TestData.Event.password,
-        coupleId:  TestData.Event.coupleId
+       _id: TestData.Event.id
       })
       .findOneQ()
       .then(function (event) {
