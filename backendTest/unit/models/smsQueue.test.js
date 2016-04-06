@@ -5,6 +5,7 @@ var mongoose = require('mongoose-promised'),
   Event = require('../../../app/models/event.js'),
   Contact = require('../../../app/models/contact.js'),
   SmsQueue = require('../../../app/models/smsQueue.js'),
+  smsEventStateReferences = require('../../../config/smsEventStateReferences.js'),
   expect = require('chai').expect;
 
 describe('SmsQueue model', function () {
@@ -25,10 +26,13 @@ describe('SmsQueue model', function () {
         TestData.SmsQueue.id = smsQueue[0]._id;
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 
-  it('expect create the smsQueue', function (done) {
+  it('expect return the smsQueue', function (done) {
     SmsQueue.model
       .where({
        _id: TestData.SmsQueue.id
@@ -40,6 +44,21 @@ describe('SmsQueue model', function () {
         done();
       })
       .catch(done);
+  });
+
+  it('expect update sms status', function (done) {
+    var _SmsQueue = new SmsQueue.model();
+    _SmsQueue
+      .updateStatus(TestData.smsSession, TestData.smsState, TestData.smsReason)
+      .then(function (sms) {
+        expect(sms).to.be.an('array');
+        expect(sms[0]).to.be.an('object');
+        expect(sms[0].status).to.be.equal(parseInt(smsEventStateReferences.status[TestData.smsState]));
+        done();
+      })
+      .catch(function(err) {
+        done(err);
+      });
   });
 
   after(function(done) {
@@ -63,6 +82,9 @@ describe('SmsQueue model', function () {
         mongoose.connection.close();
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 });

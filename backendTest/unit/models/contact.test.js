@@ -13,6 +13,7 @@ describe('Contact model', function () {
         return new Event.model(TestData.Event).saveQ()
       })
       .then(function(event) {
+        TestData.Event.id = event[0]._id;
         TestData.Contact.event = event[0]._id;
         return new Contact.model(TestData.Contact).saveQ()
       })
@@ -20,16 +21,31 @@ describe('Contact model', function () {
         TestData.Contact.id = contact[0]._id;
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 
-  it('expect create the contact', function (done) {
+  it('expect return the contact for event', function (done) {
     var _Contact = new Contact.model();
     _Contact
       .getContactForEvent(TestData.Contact.event)
       .then(function (contact) {
         expect(contact[0]).to.be.an('object');
         expect(contact[0].status).to.equal(TestData.Contact.status);
+        done();
+      })
+      .catch(done);
+  });
+
+  it('expect return the contact for wedding reminder', function (done) {
+    var _Contact = new Contact.model();
+    _Contact
+      .getContactForWeddingReminder(TestData.Event)
+      .then(function (contact) {
+        expect(contact[0]).to.be.an('object');
+        expect(TestData.Event.smsRemindStatusList).to.include(contact[0].status);
         done();
       })
       .catch(done);
@@ -51,6 +67,9 @@ describe('Contact model', function () {
         mongoose.connection.close();
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 });

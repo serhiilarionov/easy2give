@@ -4,6 +4,10 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "components"
-  ]
+    "libs"
+  ],
+  "dependencies": {
+    "dragscroll": "^0.0.6",
+    "slick-carousel": "^1.5.9"
+  }
 }

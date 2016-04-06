@@ -22,7 +22,10 @@ describe('Clear old data service', function () {
         TestData[TestData.modelName].id = template[0]._id;
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 
   it('expect clear old data', function (done) {
@@ -49,6 +52,9 @@ describe('Clear old data service', function () {
         mongoose.connection.close();
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 });

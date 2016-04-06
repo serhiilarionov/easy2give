@@ -7,7 +7,7 @@ var TestData = require('../testingData/testData.js'),
 describe('Email service', function () {
   it('expect send email', function (done) {
     Email.send(TestData.Email.template, TestData.Email.subject,
-      TestData.Email.mailList, TestData.paramList)
+      TestData.Email.mailList, TestData.paramsList)
      .then(function(res){
         expect(res).to.be.true;
         done();

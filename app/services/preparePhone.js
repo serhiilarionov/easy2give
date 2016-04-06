@@ -12,7 +12,7 @@ var preparePhone = function(phone) {
 
   //check if 0 not exists for 9 symbols numbers
   if (phone.match(/^.{9,9}$/i)) {
-    phone = '0'.phone;
+    phone = '0' + phone;
   }
 
   //replace first 0 or 972 to +972

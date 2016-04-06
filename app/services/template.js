@@ -8,15 +8,15 @@ var Template = function() {
   /**
    * Get template and prepare text for sending
    * @param filePath
-   * @param paramList
+   * @param paramsList
    * @returns {Promise.<T>}
    */
-  var getTemplate = function(filePath, paramList) {
+  var getTemplate = function(filePath, paramsList) {
     return File.readFromFile(filePath)
       .then(function(template) {
-        for(var index in paramList) {
+        for(var index in paramsList) {
           var re = new RegExp("%"+index+"%","g");
-          template = template.replace(re, paramList[index]);
+          template = template.replace(re, paramsList[index]);
         }
         return template;
       })

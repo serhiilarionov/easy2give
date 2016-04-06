@@ -10,6 +10,7 @@ var Contact = function(){
   //scheme of Contact model
   var ContactScheme = new Schema({
     status: {type: Number},
+    numberOfGuests: {type: Number},
     phone: {type: String},
     event: {type: Schema.Types.ObjectId, ref: 'Event'},
     createdAt: {type: Date},
@@ -43,6 +44,23 @@ var Contact = function(){
           contactReferences.statusNotResponded,
           contactReferences.statusMaybe
         ]}
+      })
+      .findQ()
+      .then(function (contacts){
+        return contacts;
+      });
+  };
+
+  /**
+   * Get contacts for reminder of wedding
+   * @param event
+   * @returns {Promise.<T>}
+   */
+  ContactScheme.methods.getContactForWeddingReminder = function getContactForWeddingReminder(event) {
+    return this.model('Contact').where({
+      event: event.id,
+      status: {
+        $in: event.smsRemindStatusList}
       })
       .findQ()
       .then(function (contacts){

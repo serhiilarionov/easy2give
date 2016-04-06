@@ -1,5 +1,5 @@
 node_modules/
-public/components
+libs
 .sass-cache
 .idea
 build

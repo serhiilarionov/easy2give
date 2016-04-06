@@ -2,13 +2,15 @@
 
 var Sms = function() {
   var cellact = require('../../config/cellact.js'),
+    preparePhone = require('./preparePhone.js'),
     url = require('../../config/url.js'),
     File = require('./file.js'),
-    Curl = require( 'node-libcurl' ).Curl,
+    Curl = require('node-libcurl').Curl,
     moment = require('moment'),
     mongoose = require('mongoose-promised'),
+    parserXML = require('xml2json'),
     Promise = require('bluebird');
-
+  require('events').EventEmitter.prototype._maxListeners = 0;
   /**
     * Send sms
     * @param recipient
@@ -17,6 +19,7 @@ var Sms = function() {
   */
   var send = function(recipient, content, confirmUrl) {
     confirmUrl = confirmUrl || url.confirmUrl;
+    recipient = preparePhone(recipient);
     var XMLString = '<PALO>' +
       '<HEAD>' +
       '<FROM>' + cellact.company + '</FROM>' +
@@ -51,10 +54,8 @@ var Sms = function() {
         var message = moment().format() + ': ' + statusCode + ' ' + body;
         File.writeToFile('/sms-send.log', message);
         this.close();
-        var response = {};
-        response['statusCode'] = statusCode;
-        response['body'] = body;
-        resolve(response);
+        var response = JSON.parse(parserXML.toJson(body));
+        resolve(response.PALO);
       });
       curl.on('error', function(err, errCode) {
         File.writeToFile('/sms-send.log', err.message);

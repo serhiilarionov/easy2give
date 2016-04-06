@@ -1,6 +1,6 @@
 var express = require('express');
 var glob = require('glob');
-
+var mongoose = require('mongoose-promised');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -13,13 +13,14 @@ module.exports = function(app, config) {
   models.forEach(function (model) {
     require(model);
   });
-  var mongoose = require('mongoose-promised'),
-    ErrorLog = mongoose.model('Error');
 
+  var ErrorLog = mongoose.model('Error');
   var env = process.env.NODE_ENV || 'development';
   app.locals.ENV = env;
   app.locals.ENV_DEVELOPMENT = env == 'development';
-  
+
+  app.engine('.html', require('ejs').__express);
+
   app.set('views', config.root + '/app/views');
   app.set('view engine', 'ejs');
 
@@ -29,6 +30,7 @@ module.exports = function(app, config) {
   app.use(bodyParser.urlencoded({
     extended: true
   }));
+
   app.use(cookieParser());
   app.use(compress());
   app.use(express.static(config.root + '/public'));

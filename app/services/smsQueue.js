@@ -8,7 +8,6 @@ var smsQueue = function() {
     Promise = require('bluebird'),
     eventReferences = require('../../config/eventReferences.js'),
     smsQueueReferences = require('../../config/smsQueueReferences.js'),
-    preparePhone = require('./preparePhone.js'),
     SmsQueue = mongoose.model('SmsQueue'),
     Template = mongoose.model('Template');
 
@@ -22,17 +21,17 @@ var smsQueue = function() {
     var phoneList = ['groomPhone', 'bridePhone'];
     var phone = false;
     for (var param in paramsList) {
-      url[param] = event[param];
+      url[param] = paramsList[param];
     }
     var _Template = new Template();
     return _Template.getContent(waveType, url)
       .then(function(content) {
         var promises = [];
         phoneList.forEach(function(phoneItem) {
-          phone = preparePhone(event[phoneItem]);
+          phone = event[phoneItem];
           if (phone) {
             var sms = {};
-            sms.event = event;
+            sms.event = event.id;
             sms.waveType = waveType;
             sms.status = smsQueueReferences.wait;
             sms.smsText = content;

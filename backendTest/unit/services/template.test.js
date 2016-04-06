@@ -6,10 +6,10 @@ var TestData = require('../testingData/testData.js'),
 
 describe('Template service', function () {
   it('expect return template', function (done) {
-    Template.getTemplate(TestData.Email.template, TestData.paramList)
+    Template.getTemplate(TestData.Email.template, TestData.paramsList)
       .then(function(res){
         expect(res).to.be.a('string');
-        expect(res).to.have.length.above(1);
+        expect(res).to.have.length.above(0);
         done();
       })
       .catch(done);

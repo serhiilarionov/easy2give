@@ -3,6 +3,7 @@
 var Email = function() {
   var File = require('./file.js'),
     emailConfig = require('../../config/email.js'),
+    url = require('../../config/url.js'),
     moment = require('moment'),
     nodemailer = require('nodemailer'),
     mongoose = require('mongoose-promised'),
@@ -15,11 +16,14 @@ var Email = function() {
    * @param filePath
    * @param subject
    * @param emailList
-   * @param paramList
+   * @param paramsList
    */
-  var send = function(filePath, subject, emailList, paramList) {
+  var send = function(filePath, subject, emailList, paramsList) {
+    for (var param in paramsList) {
+      url[param] = paramsList[param];
+    }
     //get template for sending
-    return Template.getTemplate(filePath, paramList)
+    return Template.getTemplate(filePath, url)
       .then(function(html) {
         // create reusable transporter object and promisify him
         var transporter = Promise.promisifyAll(nodemailer.createTransport(emailConfig.transport));

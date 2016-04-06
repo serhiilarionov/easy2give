@@ -16,9 +16,15 @@ describe('Home controller', function() {
   before(function (done) {
     require('../../../config/express')(app, config);
     server = app.listen(config.port, function() {
-      mongoose.connect(TestData.dbPath, function(err) {
-        done(err);
-      });
+      mongoose.connectQ(TestData.dbPath)
+        .then(function() {
+          done();
+        })
+        .catch(function(err){
+          mongoose.connection.close();
+          server.close();
+          done(err);
+        });
     });
   });
 

@@ -15,7 +15,7 @@ var chai = require('chai'),
   _ = require('lodash'),
   app = express(),
   server;
-
+require('events').EventEmitter.prototype._maxListeners = 0;
 chai.should();
 
 describe('Waves controller', function() {
@@ -41,7 +41,11 @@ describe('Waves controller', function() {
           TestData.SmsQueue.id = smsQueue[0]._id;
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          mongoose.connection.close();
+          server.close();
+          done(err);
+        });
     });
   });
 
@@ -67,7 +71,11 @@ describe('Waves controller', function() {
         server.close();
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        server.close();
+        done(err);
+      });
   });
 
   it('should start first wave', function(done) {
@@ -82,9 +90,7 @@ describe('Waves controller', function() {
         event.eventStatus.should.be.equal(eventStatus);
         done();
       })
-      .catch(function(err) {
-        done(err);
-      });
+      .catch(done);
   });
 
   it('should start second wave', function(done) {
@@ -99,8 +105,6 @@ describe('Waves controller', function() {
         event.eventStatus.should.be.equal(eventStatus);
         done();
       })
-      .catch(function(err) {
-        done(err);
-      });
+      .catch(done);
   });
 });

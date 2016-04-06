@@ -30,15 +30,8 @@ module.exports = {
       1: 'Call center done'
     }
   },
-  eventFields: {
-    0: 'firstWave',
-    1: 'secondWave',
-    2: 'IVR',
-    3: 'callCenter'
-  },
   waveStatus: {
     start: 0,
     end: 1
   }
-
 };

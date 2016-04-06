@@ -15,14 +15,16 @@ describe('Template model', function () {
         TestData.Sms.Template.id = template[0]._id;
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 
-  it('expect create the template', function (done) {
+  it('expect return the template', function (done) {
     Template.model
       .where({
-        name: TestData.Sms.Template.name,
-        text:  TestData.Sms.Template.text
+        _id: TestData.Sms.Template.id
       })
       .findOneQ()
       .then(function (template) {

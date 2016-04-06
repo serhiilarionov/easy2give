@@ -7,5 +7,6 @@ module.exports = {
   'bitlyGooglePlay': 'http://bit.ly/1QL6BpW',
   'bitlyYouTube': 'http://youtube.com',
   'bitlyGuestTable': 'http://bit.ly/221TeZG',
-  'confirmUrl': 'http://easy2give.xf0.ru/'
+  'confirmUrl': 'http://easy2give.xf0.ru/',
+  'eventPlaceUrl': 'http://easy2give.xf0.ru/p/'
 };

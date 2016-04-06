@@ -1,10 +1,10 @@
 'use strict';
 
 var mongoose = require('mongoose-promised'),
-  TestData = require('../testingData/testData.js'),
   Template = mongoose.model('Template'),
-  SmsQueue = require('../../../app/models/smsQueue.js'),
+  SmsQueue = mongoose.model('SmsQueue'),
   Sms = require('../../../app/services/sms.js'),
+  TestData = require('../testingData/testData.js'),
   expect = require('chai').expect;
 
 describe('Sms service', function () {
@@ -17,18 +17,21 @@ describe('Sms service', function () {
         TestData.Sms.Template.id = template[0]._id;
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 
   it('expect send sms', function (done) {
     var _Template = new Template();
-    _Template.getContent(TestData.Sms.Template.name, TestData.paramList)
+    _Template.getContent(TestData.Sms.Template.name, TestData.paramsList)
       .then(function(template) {
         return Sms.send(TestData.Sms.phoneNumber, template);
       })
       .then(function(res){
         expect(res).to.be.a('object');
-        expect(res).to.have.all.keys('statusCode', 'body');
+        expect(res).to.have.all.keys('DESCRIPTION', 'RESULT');
         done();
       })
       .catch(done);

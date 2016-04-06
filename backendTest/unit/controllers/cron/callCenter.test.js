@@ -11,16 +11,17 @@ var chai = require('chai'),
   config = require('../../../../config/config'),
   eventReferences = require('../../../../config/eventReferences.js'),
   TestData = require('../../testingData/testData.js'),
-  sendModule = require('../../../../app/controllers/cron/send.js'),
+  callCenterModule = require('../../../../app/controllers/cron/callCenter.js'),
   smsQueueReferences = require('../../../../config/smsQueueReferences.js'),
   _ = require('lodash'),
+  expect = require('chai').expect,
   app = express(),
   server;
 
 chai.should();
 
-describe('Waves controller', function() {
-  before(function (done) {
+describe('CallCenter controller', function() {
+  before(function(done) {
     require('../../../../config/express')(app, config);
     server = app.listen(config.port, function() {
       mongoose.connectQ(TestData.dbPath)
@@ -28,53 +29,41 @@ describe('Waves controller', function() {
           return Event(TestData.Event).saveQ()
         })
         .then(function(event) {
-          TestData.SmsQueue.event = event[0]._id;
-          return Contact(TestData.Contact).saveQ()
-        })
-        .then(function (contact) {
-          TestData.SmsQueue.contact = contact[0]._id;
-          return SmsQueue(TestData.SmsQueue).saveQ()
-        })
-        .then(function (smsQueue) {
-          TestData.SmsQueue.id = smsQueue[0]._id;
+          TestData.Event.id = event[0]._id;
           done();
         })
-        .catch(done);
+        .catch(function(err){
+          mongoose.connection.close();
+          server.close();
+          done(err);
+        });
     });
   });
 
-  after(function (done) {
-    SmsQueue
+  after(function(done) {
+    Event
       .where({
-        _id: TestData.SmsQueue.id
+        _id: TestData.Event.id
       }).removeQ()
-      .then(function() {
-        return Contact
-          .where({
-            _id: TestData.SmsQueue.contact
-          }).removeQ()
-      })
-      .then(function() {
-        return Event
-          .where({
-            _id: TestData.SmsQueue.event
-          }).removeQ();
-      })
       .then(function() {
         mongoose.connection.close();
         server.close();
         done();
       })
-      .catch(done);
-  });
-
-  it('should start first wave', function(done) {
-    sendModule.send.sms()
-      .then(function() {
-        done();
-      })
-      .catch(function(err) {
+      .catch(function(err){
+        mongoose.connection.close();
+        server.close();
         done(err);
       });
+  });
+
+  it('should save sms to sms queue', function(done) {
+    callCenterModule.callCenter.coupleRemindCallCenter()
+      .then(function(smsQueue) {
+        expect(smsQueue[0]).to.be.an('array');
+        expect(smsQueue[0]).to.have.length.above(0);
+        done();
+      })
+      .catch(done);
   });
 });

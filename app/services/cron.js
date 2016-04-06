@@ -6,6 +6,10 @@ var Cron = function() {
     dateFormats = require('../../config/dateFormats.js'),
     File = require('./file.js'),
     wavesModule = require('../controllers/cron/waves.js'),
+    smsModule = require('../controllers/cron/sms.js'),
+    disableModule = require('../controllers/cron/disable.js'),
+    remindWeddingModule = require('../controllers/cron/remindWedding.js'),
+    callCenterModule = require('../controllers/cron/callCenter.js'),
     clearOldData = require('../services/clearOldData.js');
 
   const FIRST_WAVE_FIELD = 'firstWave';
@@ -20,7 +24,7 @@ var Cron = function() {
   var clearDataJob = new CronJob({
     cronTime: '0 * * * * 6',
     onTick: function() {
-      var now = moment().format(dateFormats.format);
+      var now = moment().subtract(7,'d').format(dateFormats.format);
       clearOldData('Error', now)
         .catch(function(err) {
           File.writeToFile('/error.log', err);
@@ -58,7 +62,87 @@ var Cron = function() {
       wavesModule.waves.notifyWave(SECOND_WAVE_FIELD, now)
         .catch(function(err) {
           File.writeToFile('/error.log', err);
-          Cron.stop(firstWave);
+          Cron.stop(secondWave);
+        });
+    },
+    start: false
+  });
+
+  /**
+   * Cron task for send sms from sms queue
+   * @type {*|CronJob}
+   */
+  var sendSms = new CronJob({
+    cronTime: '0 * * * * *',
+    onTick: function() {
+      smsModule.send.sms()
+        .catch(function(err) {
+          File.writeToFile('/error.log', err);
+          Cron.stop(sendSms);
+        });
+    },
+    start: false
+  });
+
+  /**
+   * Cron task for disable events by not paid
+   * @type {*|CronJob}
+   */
+  var disableByNotPaid = new CronJob({
+    cronTime: '0 * * * * *',
+    onTick: function() {
+      disableModule.disable.byNotPaid()
+        .catch(function(err) {
+          File.writeToFile('/error.log', err);
+          Cron.stop(disableByNotPaid);
+        });
+    },
+    start: false
+  });
+
+  /**
+   * Cron task for disable events by expiration date
+   * @type {*|CronJob}
+   */
+  var disableByExpirationDate = new CronJob({
+    cronTime: '0 * * * * *',
+    onTick: function() {
+      disableModule.disable.byExpirationDate()
+        .catch(function(err) {
+          File.writeToFile('/error.log', err);
+          Cron.stop(disableByExpirationDate);
+        });
+    },
+    start: false
+  });
+
+  /**
+   * Cron task for disable events by expiration date
+   * @type {*|CronJob}
+   */
+  var remindWedding = new CronJob({
+    cronTime: '0 * * * * *',
+    onTick: function() {
+      remindWeddingModule.remind.remindWedding()
+        .catch(function(err) {
+          File.writeToFile('/error.log', err);
+          Cron.stop(remindWedding);
+        });
+    },
+    start: false
+  });
+
+  /**
+   * Cron task for sending reminder before starting a call center to couple
+   * @type {*|CronJob}
+   */
+  var coupleRemindCallCenter = new CronJob({
+    cronTime: '0 * * * * *',
+    onTick: function() {
+      callCenterModule.callCenter.coupleRemindCallCenter()
+        .catch(function(err) {
+          File.writeToFile('/error.log', err);
+          Cron.stop(coupleRemindCallCenter);
         });
     },
     start: false

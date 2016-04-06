@@ -15,14 +15,16 @@ describe('Error model', function () {
         TestData.ErrorLog.id = error[0]._id;
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 
-  it('expect create the error', function (done) {
+  it('expect return the error', function (done) {
     ErrorLog.model
       .where({
-        errorStatus: TestData.ErrorLog.errorStatus,
-        errorMessage:  TestData.ErrorLog.errorMessage
+        _id: TestData.ErrorLog.id
       })
       .findOneQ()
       .then(function (error) {
@@ -44,6 +46,9 @@ describe('Error model', function () {
         mongoose.connection.close();
         done();
       })
-      .catch(done);
+      .catch(function(err){
+        mongoose.connection.close();
+        done(err);
+      });
   });
 });

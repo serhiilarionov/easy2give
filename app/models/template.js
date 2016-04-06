@@ -34,16 +34,16 @@ var Template = function(){
   /**
    * Get content for sms by contentType
    * @param contentType
-   * @param paramList
+   * @param paramsList
    * @returns {Promise.<T>}
    */
-  TemplateScheme.methods.getContent = function getContent(contentType, paramList) {
+  TemplateScheme.methods.getContent = function getContent(contentType, paramsList) {
     return this.model('Template').where({name: contentType})
       .findOneQ()
       .then(function (template){
-        for(var index in paramList) {
+        for(var index in paramsList) {
           var re = new RegExp("%"+index+"%","g");
-          template.text = template.text.replace(re, paramList[index]);
+          template.text = template.text.replace(re, paramsList[index]);
         }
         return template.text;
       });
