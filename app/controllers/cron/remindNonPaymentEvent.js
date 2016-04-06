@@ -19,8 +19,8 @@ var paidRemind = function () {
   var remindByNotPaid = function() {
     var expirationDate = moment().subtract(2, 'd').format(dateFormats.format);
     return Event.where({
-      createdAt: {$lte: expirationDate},
-      //createdAt: expirationDate,
+      //createdAt: {$lte: expirationDate},
+      createdAt: expirationDate,
       disabledAt: {$exists: false},
       paymentDone: {$ne: true}
     }).findQ()

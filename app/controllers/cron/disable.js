@@ -50,7 +50,7 @@ var disable = function () {
     var expirationDate = moment().subtract(3, 'd').format(dateFormats.format);
 
     return Event.where({
-      createdAt: {$lt: expirationDate},
+      createdAt: {$lte: expirationDate},
       disabledAt: {$exists: false},
       paymentDone: {$ne: true}
     }).findQ()

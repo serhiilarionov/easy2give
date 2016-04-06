@@ -23,8 +23,8 @@ var remindWaves = function () {
     or.push({firstWave: {$exists: false}});
     or.push({secondWave: {$exists: false}});
     return Event.where({
-      date: {$gte: expirationDate},
-      //date: expirationDate,
+      //date: {$gte: expirationDate},
+      date: expirationDate,
       smsAllowed: true,
       $or: or
     }).findQ()

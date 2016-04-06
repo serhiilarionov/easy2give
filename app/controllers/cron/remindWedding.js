@@ -22,8 +22,8 @@ var remind = function () {
 
     return Event.where({
       smsRemind: true,
-      smsRemindDate: {$lte: date},
-      //smsRemindDate: date,
+      //smsRemindDate: {$lte: date},
+      smsRemindDate: date,
       smsAllowed: true
     }).findQ()
       .then(function(events) {

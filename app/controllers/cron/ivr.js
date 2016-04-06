@@ -24,8 +24,8 @@ var ivr = function () {
   var notifyIVR = function() {
     var expirationDate = moment().subtract('3', 'd').format(dateFormats.format);
     var where = {};
-    where['secondWave'] = {"$gte": expirationDate};
-    //where[waveType] = date;
+    //where['secondWave'] = {"$gte": expirationDate};
+    where['secondWave'] = date;
     where['ivrAllowed'] = true;
     where['ivrRecordFile'] = true;
     return Event
