@@ -11,7 +11,7 @@ var now = moment().format(dateFormats.format);
 var tomorrow = moment().add('1', 'd').format(dateFormats.format);
 var lastWeek = moment().subtract('7', 'd').format(dateFormats.format);
 var testImg = {
-  data: fs.readFileSync(process.env.PWD + '/www/easy2give/public/img/logo.png'),
+  //data: fs.readFileSync(process.env.PWD + '/www/easy2give/public/img/logo.png'),
   contentType: 'image/png'
   };
 var testData = {
@@ -31,7 +31,7 @@ var testData = {
     showBanner : true,
     smsRemind : true,
     smsRemindStatusList: [1,2],
-    groomPhone: '0533363561',
+    groomPhone: '123123123',
     callRSVP: true,
     isInstructionSent: false,
     paymentDone: true,
@@ -51,7 +51,7 @@ var testData = {
     showBanner : true,
     smsRemind : true,
     smsRemindStatusList: [1,2],
-    groomPhone: '0533363561',
+    groomPhone: '123123123',
     callRSVP: true,
     createdAt: lastWeek,
     groomEmail: 'serhiilarionov@gmail.com',
@@ -70,11 +70,11 @@ var testData = {
   },
   SmsQueue: {
     status: 0,
-    phone: '0533363561',
+    phone: '123123123',
     session : '37f289e3-dca5-436a-8ddc-28257507d48a'
   },
   IvrQueue: {
-    phone: '0533363561'
+    phone: '123123123'
   },
   smsSession: "37f289e3-dca5-436a-8ddc-28257507d48a",
   smsState: 'mt_nok',
@@ -92,7 +92,7 @@ var testData = {
       name: 'test',
       text: 'Hello'
     },
-    phoneNumber: '0533363561'
+    phoneNumber: '123123123'
   },
   Email: {
     template: './public/templates/email/instruction.html',
