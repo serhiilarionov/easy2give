@@ -5,28 +5,34 @@ var Contact = function(){
     dateFormats = require('../../config/dateFormats.js'),
     contactReferences = require('../../config/contactReferences.js'),
     mongoose = require('mongoose-promised'),
+    shortid = require('shortid'),
     Schema = mongoose.Schema;
 
   //scheme of Contact model
   var ContactScheme = new Schema({
+    _id: {
+      type: String,
+      unique: true,
+      'default': shortid.generate
+    },
     status: {type: Number},
     numberOfGuests: {type: Number},
     phone: {type: String},
-    event: {type: Schema.Types.ObjectId, ref: 'Event'},
-    createdAt: {type: Date},
-    updatedAt: {type: Date}
+    event: {type: String},
+    _created_at: {type: Date},
+    _updated_at: {type: Date}
   });
 
   ContactScheme.pre('save', function(next) {
     // get the current date
     var currentDate = moment().format(dateFormats.format);
 
-    // change the updatedAt field to current date
-    this.updatedAt = currentDate;
+    // change the _updated_at field to current date
+    this._updated_at = currentDate;
 
-    // if createdAt doesn't exist, add to that field
-    if (!this.createdAt)
-      this.createdAt = currentDate;
+    // if _created_at doesn't exist, add to that field
+    if (!this._created_at)
+      this._created_at = currentDate;
 
     next();
   });
@@ -38,7 +44,7 @@ var Contact = function(){
    */
   ContactScheme.methods.getContactForEvent = function getContactForEvent(event) {
     return this.model('Contact').where({
-      event: event,
+      $or: [{event: event.id}, {_p_event: 'Event$' + event.id}],
       status: {
         $in: [
           contactReferences.statusNotResponded,
@@ -58,7 +64,7 @@ var Contact = function(){
    */
   ContactScheme.methods.getContactForWeddingReminder = function getContactForWeddingReminder(event) {
     return this.model('Contact').where({
-      event: event.id,
+      $or: [{event: event.id}, {_p_event: 'Event$' + event.id}],
       status: {
         $in: event.smsRemindStatusList}
       })

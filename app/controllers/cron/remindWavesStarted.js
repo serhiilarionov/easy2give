@@ -18,8 +18,8 @@ var remindWavesStarted = function () {
    * Send event status to couple
    * @returns {*|Promise.<T>}
    */
-  var sendEventStatus = function() {
-    var expirationDate = moment().add(1, 'd').format(dateFormats.format);
+  var sendEventStatus = function(date) {
+    var expirationDate = moment(date).add(1, 'd').format(dateFormats.format);
 
     var where = [];
     var firstWave = {};

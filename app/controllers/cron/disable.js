@@ -23,7 +23,8 @@ var disable = function () {
 
     return Event.where({
       date: {$lte: expirationDate},
-      disabledAt: {$exists: false}
+      disabledAt: {$exists: false},
+      paymentDone: true
     }).findQ()
       .then(function(events) {
         var promises = [];
@@ -50,7 +51,7 @@ var disable = function () {
     var expirationDate = moment().subtract(3, 'd').format(dateFormats.format);
 
     return Event.where({
-      createdAt: {$lte: expirationDate},
+      _created_at: {$lte: expirationDate},
       disabledAt: {$exists: false},
       paymentDone: {$ne: true}
     }).findQ()
@@ -113,8 +114,8 @@ var disable = function () {
 }();
 
 if(env === 'development') {
-  router.get('/cron/disable/notPaid', disable.byExpirationDateRoute);
-  router.get('/cron/disable/expirationDate', disable.byNotPaidRoute);
+  router.get('/cron/disable/notPaid', disable.byNotPaidRoute);
+  router.get('/cron/disable/expirationDate', disable.byExpirationDateRoute);
 }
 
 module.exports = {

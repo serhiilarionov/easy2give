@@ -20,6 +20,9 @@ module.exports = {
   }
 };
 
+/**
+ * Route for confirm page
+ */
 router.get('/c', function (req, res, next) {
   var code = req.query.code;
   if(!code) {
@@ -29,12 +32,18 @@ router.get('/c', function (req, res, next) {
   Contact.where({_id: code}).findOneQ()
     .then(function(contactModel) {
       contact = contactModel;
-      return Event.where({_id: contact.event}).findOneQ()
+      //get event id from parse object
+      var eventId = contact.toObject()._p_event ?
+        contact.toObject()._p_event.split("$")[1] : contact.event;
+      return Event.where({_id: eventId}).findOneQ()
     })
     .then(function(eventModel) {
       event = eventModel;
       var _EventPlace = new EventPlace();
-      return _EventPlace.getEventPlace(event.eventPlace, event.showBanner);
+      //get eventPlace id from parse object
+      var eventPlace = event.toObject()._p_eventPlace ?
+        event.toObject()._p_eventPlace.split("$")[1] : event.eventPlace;
+      return _EventPlace.getEventPlace(eventPlace, event.showBanner);
     })
     .then(function(eventPlace) {
       var data = {
@@ -64,6 +73,9 @@ router.get('/c', function (req, res, next) {
     });
 });
 
+/**
+ * Route for test confirm page
+ */
 router.get('/e', function (req, res, next) {
   var eventId = req.query.eventId;
   if(!eventId) {
@@ -74,7 +86,10 @@ router.get('/e', function (req, res, next) {
     .then(function(eventModel) {
       event = eventModel;
       var _EventPlace = new EventPlace();
-      return _EventPlace.getEventPlace(event.eventPlace, event.showBanner);
+      //get eventPlace id from parse object
+      var eventPlace = event.toObject()._p_eventPlace ?
+        event.toObject()._p_eventPlace.split("$")[1] : event.eventPlace;
+      return _EventPlace.getEventPlace(eventPlace, event.showBanner);
     })
     .then(function(eventPlace) {
       var data = {

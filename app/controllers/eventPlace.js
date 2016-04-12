@@ -17,6 +17,9 @@ module.exports = {
   }
 };
 
+/**
+ * Route for event place page
+ */
 router.get('/p', function (req, res, next) {
   var eventPlaceId = req.query.eventPlaceId;
   var showBanner = (typeof req.query.banner != 'undefined');
@@ -30,8 +33,8 @@ router.get('/p', function (req, res, next) {
       var data = {
         'objectId': eventPlace.id,
         'venueAddress': eventPlace.venueAddress,
-        'venueLocationLatitude': eventPlace.venueLocation[locationReferences.latitude],
-        'venueLocationLongitude': eventPlace.venueLocation[locationReferences.longitude],
+        'venueLocationLatitude': eventPlace.venueLocation ? eventPlace.venueLocation[locationReferences.latitude] : '',
+        'venueLocationLongitude': eventPlace.venueLocation ? eventPlace.venueLocation[locationReferences.longitude] : '',
         //'venueLogo': eventPlace.venueLogo ? eventPlace.venueLogo.getUrl() : '',
         'venueName': eventPlace.venueName,
         'venuePhone': eventPlace.venuePhone,

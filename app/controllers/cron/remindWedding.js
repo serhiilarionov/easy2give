@@ -22,7 +22,6 @@ var remind = function () {
 
     return Event.where({
       smsRemind: true,
-      //smsRemindDate: {$lte: date},
       smsRemindDate: date,
       smsAllowed: true
     }).findQ()
@@ -59,7 +58,7 @@ var remind = function () {
    * @param next
    */
   var weddingRoute = function (req, res, next) {
-    remindWedding()
+    wedding()
       .then(function() {
         res.sendStatus(200);
       })

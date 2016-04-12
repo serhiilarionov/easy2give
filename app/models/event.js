@@ -6,12 +6,18 @@ var Event = function(){
     dateFormats = require('../../config/dateFormats.js'),
     filePluginLib = require('mongoose-file'),
     path = require('path'),
+    shortid = require('shortid'),
     filePlugin = filePluginLib.filePlugin,
     make_upload_to_model = filePluginLib.make_upload_to_model,
     Schema = mongoose.Schema;
 
   //scheme of Event model
   var EventScheme = new Schema({
+    _id: {
+      type: String,
+      unique: true,
+      'default': shortid.generate
+    },
     date: {type: Date},
     firstWaveSmsText : {type: String},
     secondWaveSmsText : {type: String},
@@ -39,11 +45,11 @@ var Event = function(){
     brideEmail : {type: String},
     eventStatus: {type: Number},
     smsRemindStatusList: {type: Array},
-    eventPlace: {type: Schema.Types.ObjectId, ref: 'EventPlace'},
+    eventPlace: {type: String},
     coupleId : {type: String, require: true, index: { unique: true }},
     password : {type: String, require: true},
-    createdAt: {type: Date},
-    updatedAt: {type: Date}
+    _created_at: {type: Date},
+    _updated_at: {type: Date}
   });
 
   var uploads_base = path.join(__dirname, "uploads");
@@ -58,12 +64,12 @@ var Event = function(){
     // get the current date
     var currentDate = moment().format(dateFormats.format);
 
-    // change the updatedAt field to current date
-    this.updatedAt = currentDate;
+    // change the _updated_at field to current date
+    this._updated_at = currentDate;
 
-    // if createdAt doesn't exist, add to that field
-    if (!this.createdAt)
-      this.createdAt = currentDate;
+    // if _created_at doesn't exist, add to that field
+    if (!this._created_at)
+      this._created_at = currentDate;
 
     next();
   });

@@ -15,7 +15,7 @@ var clear = function(modelName, date) {
     var ErrorLog = mongoose.model('Error');
   }
   //get data for clearing
-  return model.where({createdAt: {"$lte": date}})
+  return model.where({_created_at: {"$lte": date}})
     .findQ()
     .then(function (items){
       var portions = [];

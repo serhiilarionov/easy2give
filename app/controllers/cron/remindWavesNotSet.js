@@ -20,10 +20,11 @@ var remindWaves = function () {
   var datesWavesNotSet = function() {
     var expirationDate = moment().add(14, 'd').format(dateFormats.format);
     var or = [];
+    or.push({firstWave: null});
     or.push({firstWave: {$exists: false}});
+    or.push({secondWave: null});
     or.push({secondWave: {$exists: false}});
     return Event.where({
-      //date: {$gte: expirationDate},
       date: expirationDate,
       smsAllowed: true,
       $or: or

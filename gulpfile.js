@@ -72,7 +72,7 @@ function handleError(err) {
 
 gulp.task("test", function() {
   return gulp.src('backendTest/**/*.test.js')
-    .pipe(mocha({ reporter: "spec" })
+    .pipe(mocha(({reporter: 'spec', timeout: '30000'}))
       .on("error", handleError));
 });
 

@@ -5,7 +5,8 @@ var mongoose = require('mongoose-promised'),
   SmsQueue = mongoose.model('SmsQueue'),
   Event = mongoose.model('Event'),
   Contact = mongoose.model('Contact'),
-  IVR = require('../../../app/services/ivr.js'),
+  IvrQueue = mongoose.model('IvrQueue'),
+  IVRservice = require('../../../app/services/ivr.js'),
   TestData = require('../testingData/testData.js'),
   expect = require('chai').expect;
 
@@ -16,11 +17,15 @@ describe('Ivr service', function () {
         return new Event(TestData.Event).saveQ()
       })
       .then(function(event) {
-        TestData.Contact.event = event[0]._id;
+        TestData.IvrQueue.event = event[0]._id;
         return new Contact(TestData.Contact).saveQ()
       })
       .then(function (contact) {
-        TestData.Contact.id = contact[0]._id;
+        TestData.IvrQueue.contact = contact[0]._id;
+        return new IvrQueue(TestData.IvrQueue).saveQ()
+      })
+      .then(function (ivrQueue) {
+        TestData.IvrQueue.id = ivrQueue[0]._id;
         done();
       })
       .catch(function(err){
@@ -30,7 +35,7 @@ describe('Ivr service', function () {
   });
 
   it('expect save response from ivr', function (done) {
-    IVR.saveResponse(TestData.Contact.id, TestData.ivrResponse)
+    IVRservice.saveResponse(TestData.IvrQueue.contact, TestData.ivrResponse)
       .then(function(res){
         expect(res).to.be.a('array');
         expect(res).to.have.length.above(0);
@@ -39,35 +44,40 @@ describe('Ivr service', function () {
       .catch(done)
   });
 
-  it('expect return url for redirect', function (done) {
-      IVR.redirectToRecord(TestData.Contact.id)
-        .then(function(url) {
-          expect(url).to.be.a('string');
-          expect(url).to.have.length.above(0);
-          done();
-        })
-        .catch(done)
+  it('expect send ivr', function (done) {
+    IVRservice.send(TestData.IvrQueue.phone, TestData.IvrQueue.contact)
+      .then(function(res){
+        expect(res).to.be.a('string');
+        expect(res).to.have.length.above(0);
+        done();
+      })
+      .catch(done);
   });
 
   after(function(done) {
-    Contact
+    IvrQueue
       .where({
-        _id: TestData.Contact.id
+        _id: TestData.IvrQueue.id
+      }).removeQ()
+      .then(function() {
+        return Contact
+          .where({
+            _id: TestData.IvrQueue.contact
+          }).removeQ()
       })
-      .removeQ()
       .then(function() {
         return Event
           .where({
-            _id: TestData.Contact.event
+            _id: TestData.IvrQueue.event
           }).removeQ();
       })
       .then(function() {
         mongoose.connection.close();
         done();
       })
-      .catch(function(err) {
+      .catch(function(err){
         mongoose.connection.close();
         done(err);
-      })
+      });
   });
 });

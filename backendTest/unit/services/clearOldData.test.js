@@ -32,7 +32,7 @@ describe('Clear old data service', function () {
     var now = moment().subtract(7,'d').format(dateFormats.format);
     ClearOldData(TestData.modelName, now)
       .then(function(){
-        return model.where({createdAt: {"$lte": now}}).findQ()
+        return model.where({_created_at: {"$lte": now}}).findQ()
       })
       .then(function(res) {
         expect(res).to.be.an('array');

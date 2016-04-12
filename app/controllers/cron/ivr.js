@@ -4,12 +4,11 @@ var express = require('express'),
   Promise = require('bluebird'),
   Event = mongoose.model('Event'),
   Contact = mongoose.model('Contact'),
-  SmsQueue = mongoose.model('SmsQueue'),
   IvrQueue = mongoose.model('IvrQueue'),
-  Sms = require('../../services/sms.js'),
+  Ivr = require('../../services/ivr.js'),
   moment = require('moment'),
   dateFormats = require('../../../config/dateFormats.js'),
-  smsQueueReferences = require('../../../config/smsQueueReferences.js'),
+  ivrQueueReferences = require('../../../config/ivrQueueReferences.js'),
   eventReferences = require('../../../config/eventReferences.js'),
   _ = require('lodash'),
   File = require('../../services/file.js'),
@@ -18,14 +17,13 @@ var express = require('express'),
 
 var ivr = function () {
   /**
-   * Send ivr from queue
+   * Create ivr queue
    * @returns {Promise.<T>}
    */
   var notifyIVR = function() {
     var expirationDate = moment().subtract('3', 'd').format(dateFormats.format);
     var where = {};
-    //where['secondWave'] = {"$gte": expirationDate};
-    where['secondWave'] = date;
+    where['secondWave'] = expirationDate;
     where['ivrAllowed'] = true;
     where['ivrRecordFile'] = true;
     return Event
@@ -58,8 +56,10 @@ var ivr = function () {
             var phone = contact.phone;
             if (phone) {
               var ivr = {};
-              ivr.event = promise.event;
+              ivr.contact = contact.id;
+              ivr.event = promise.event.id;
               ivr.phone = phone;
+              ivr.status = ivrQueueReferences.wait;
               new IvrQueue(ivr).saveQ();
             }
           });
@@ -68,7 +68,67 @@ var ivr = function () {
   };
 
   /**
-   * Route for ivr sending
+   * Send ivr from ivr queue
+   * @returns {Promise.<T>|*}
+   */
+  var send = function() {
+    var where = {};
+    where['status'] = ivrQueueReferences.wait;
+    return IvrQueue
+      .where(where)
+      .findQ()
+      .then(function(ivrQueue) {
+        var portions = [];
+        //array divided into portions
+        while (ivrQueue.length > 0) {
+          portions.push(ivrQueue.splice(0, 100));
+        }
+
+        //send all the ivr by the 100 rows
+        async.eachSeries(portions, function(portion) {
+          var portionPromises = [];
+          portion.forEach(function(item) {
+            portionPromises.push(
+              Ivr.send(item.phone, item.contact)
+                .then(function(response) {
+                  if (response) {
+                    item.state = response;
+                    item.status = ivrQueueReferences.send;
+                    item.save();
+                    return {
+                      ivr: item
+                    }
+                  }
+                })
+            )
+          });
+
+          //handling all responses
+          return Promise.each(portionPromises, function(promise) {
+            if (promise) {
+              return Event.where({
+                _id: promise.ivr.event
+              }).findOneQ()
+                .then(function(event) {
+                  //change the status of event to the wave ended
+                  event.eventStatus = (_.invert(eventReferences.eventStatuses))
+                    [eventReferences.eventWavesTypes['IVR'][eventReferences.waveStatus.end]];
+                  return event.saveQ();
+                })
+                .catch(function(err) {
+                  File.writeToFile('/error.log', err.message);
+                })
+            }
+          })
+          .catch(function(err) {
+            File.writeToFile('/error.log', err.message);
+          })
+        });
+      });
+  };
+
+  /**
+   * Route for create ivr queue
    * @param req
    * @param res
    * @param next
@@ -83,15 +143,35 @@ var ivr = function () {
       });
   };
 
+  /**
+   * Route for ivr sending
+   * @param req
+   * @param res
+   * @param next
+   */
+  var sendRoute = function (req, res, next) {
+    send()
+      .then(function() {
+        res.sendStatus(200);
+      })
+      .catch(function(err) {
+        next(err);
+      });
+  };
+
+
   return {
     notifyIVR : notifyIVR,
-    notifyIVRRoute : notifyIVRRoute
+    notifyIVRRoute : notifyIVRRoute,
+    send: send,
+    sendRoute: sendRoute
   }
 
 }();
 
 if(env === 'development') {
-  router.get('/cron/send/ivr', ivr.notifyIVRRoute);
+  router.get('/cron/notify/ivr', ivr.notifyIVRRoute);
+  router.get('/cron/send/ivr', ivr.sendRoute);
 }
 
 module.exports = {

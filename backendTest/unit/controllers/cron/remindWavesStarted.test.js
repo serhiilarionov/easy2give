@@ -49,7 +49,7 @@ describe('RemindWavesStarted controller', function() {
   });
 
   it('should save reminders to sms queue', function(done) {
-    remindWavesStartedModule.remindWavesStarted.sendEventStatus()
+    remindWavesStartedModule.remindWavesStarted.sendEventStatus(TestData.now)
       .then(function(smsQueue) {
         expect(smsQueue[0]).to.be.an('array');
         expect(smsQueue[0]).to.have.length.above(0);

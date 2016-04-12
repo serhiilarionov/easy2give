@@ -21,7 +21,6 @@ var callCenter = function () {
     var expirationDate = moment().subtract(1, 'd').format(dateFormats.format);
 
     return Event.where({
-      //secondWave: {$gte: expirationDate},
       secondWave: expirationDate,
       callRSVP: true,
       callCenter: {$exists: true, $ne: null}

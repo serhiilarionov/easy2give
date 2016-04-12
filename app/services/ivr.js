@@ -6,12 +6,15 @@ var Ivr = function() {
     changesLogReferences = require('../../config/changesLogReferences.js'),
     preparePhone = require('./preparePhone.js'),
     url = require('../../config/url.js'),
+    Curl = require('node-libcurl').Curl,
+    File = require('./file.js'),
     moment = require('moment'),
     mongoose = require('mongoose-promised'),
     Contact = mongoose.model('Contact'),
     Event = mongoose.model('Event'),
     ChangesLog = mongoose.model('ChangesLog'),
     ffmpeg = require('ffmpeg'),
+    querystring = require("querystring"),
     Promise = require('bluebird');
 
   const RECORD_PATH = '/ivr/mp3/';
@@ -112,13 +115,68 @@ var Ivr = function() {
           });
       })
     });
-
   }
 
-  return {
+  /**
+   * Send request to IVR service
+   * @param phone
+   * @param contactId
+   */
+  function send(phone, contactId) {
+    var url = 'http://www.micropay.co.il/ExtApi/ScheduleVms.php';
+    phone = preparePhone(phone);
+
+    var param = {
+      'get': 1,
+      'uid': 3590,
+      'un': 'mickey',
+      'desc': 'Test',
+      'from': '0722737082',
+      'list': phone,
+      'sid': '38574',
+      'retry': 2,
+      'retryint': 1,
+      'amd': 3,
+      'data': contactId
+    };
+
+    return makeGetRequest(url, param);
+  }
+
+  /**
+   * Make GET request to the service
+   * @param url
+   * @param param
+   */
+  var makeGetRequest = function(url, param) {
+    return new Promise(function(resolve, reject) {
+      if(!url) {
+        url = 'http://la.cellactpro.com/http_req.asp';
+      }
+      url += '?' + querystring.stringify(param);
+
+      var curl = new Curl();
+      curl.setOpt('URL', url);
+      curl.on('end', function(statusCode, body, headers) {
+        var message = moment().format() + ': ' + statusCode + ' ' + body;
+        File.writeToFile('/ivr-send.log', message);
+        this.close();
+        resolve(body);
+      });
+      curl.on('error', function(err, errCode) {
+        File.writeToFile('/ivr-send.log', err.message);
+        this.close();
+        reject(err);
+      });
+      curl.perform();
+    });
+  };
+
+    return {
     saveResponse: saveResponse,
     redirectToRecord: redirectToRecord,
-    convertRecord: convertRecord
+    convertRecord: convertRecord,
+    send: send
   }
 }();
 

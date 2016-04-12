@@ -9,7 +9,7 @@ var Cron = function() {
     smsModule = require('../controllers/cron/sms.js'),
     disableModule = require('../controllers/cron/disable.js'),
     remindWeddingModule = require('../controllers/cron/remindWedding.js'),
-    callCenterModule = require('../controllers/cron/callCenter.js'),
+    callCenterModule = require('../controllers/cron/remindCallCenter.js'),
     clearOldData = require('../services/clearOldData.js');
 
   const FIRST_WAVE_FIELD = 'firstWave';

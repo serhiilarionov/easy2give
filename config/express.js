@@ -69,7 +69,7 @@ module.exports = function(app, config) {
   app.use(function (err, req, res, next) {
     //logging of errors to the error model
     if(err.status != 404) {
-      new Error({
+      new ErrorLog({
         errorStatus: err.status || 500,
         errorMessage: err.message,
         error: err

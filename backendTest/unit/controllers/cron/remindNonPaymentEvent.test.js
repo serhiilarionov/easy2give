@@ -25,10 +25,10 @@ describe('RemindNonPaymentEvent controller', function() {
     server = app.listen(config.port, function() {
       mongoose.connectQ(TestData.dbPath)
         .then(function() {
-          return Event(TestData.EventLastWeek).saveQ()
+          return Event(TestData.Event).saveQ()
         })
         .then(function(event) {
-          TestData.EventLastWeek.id = event[0]._id;
+          TestData.Event.id = event[0]._id;
           done();
         })
         .catch(done);
@@ -38,7 +38,7 @@ describe('RemindNonPaymentEvent controller', function() {
   after(function(done) {
     Event
       .where({
-        _id: TestData.EventLastWeek.id
+        _id: TestData.Event.id
       }).removeQ()
       .then(function() {
         mongoose.connection.close();

@@ -11,7 +11,7 @@ var chai = require('chai'),
   config = require('../../../../config/config'),
   eventReferences = require('../../../../config/eventReferences.js'),
   TestData = require('../../testingData/testData.js'),
-  wavesNotSetModule = require('../../../../app/controllers/cron/wavesNotSet.js'),
+  wavesNotSetModule = require('../../../../app/controllers/cron/remindWavesNotSet.js'),
   smsQueueReferences = require('../../../../config/smsQueueReferences.js'),
   _ = require('lodash'),
   expect = require('chai').expect,
@@ -26,10 +26,10 @@ describe('WavesNonSet controller', function() {
     server = app.listen(config.port, function() {
       mongoose.connectQ(TestData.dbPath)
         .then(function() {
-          return Event(TestData.Event).saveQ()
+          return Event(TestData.EventWithOutWaves).saveQ()
         })
         .then(function(event) {
-          TestData.Event.id = event[0]._id;
+          TestData.EventWithOutWaves.id = event[0]._id;
           done();
         })
         .catch(done);
@@ -39,7 +39,7 @@ describe('WavesNonSet controller', function() {
   after(function(done) {
     Event
       .where({
-        _id: TestData.Event.id
+        _id: TestData.EventWithOutWaves.id
       }).removeQ()
       .then(function() {
         mongoose.connection.close();

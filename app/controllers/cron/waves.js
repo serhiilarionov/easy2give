@@ -27,7 +27,6 @@ var waves = function () {
    */
   var notifyWave = function(waveType, date) {
     var where = {};
-    //where[waveType] = {"$lt": date};
     where[waveType] = date;
     where['smsAllowed'] = true;
     return Event
@@ -77,6 +76,7 @@ var waves = function () {
 
               var sms = {};
               sms.event = promise.event;
+              sms.contact = contact;
               sms.waveType = waveType;
               sms.status = smsQueueReferences.wait;
               sms.smsText = smsText;
@@ -149,64 +149,3 @@ module.exports = {
   },
   waves: waves
 };
-
-
-///**
-// * Get events for IVR notification
-// * @param \DateTime $date
-// * @return \Parse\ParseObject[]
-// */
-//public function getIVREvent(\DateTime $date)
-//{
-//  $ivrDate = clone $date;
-//  $ivrDate->modify("-3 hours");
-//  $query = new ParseQuery('Event');
-//  $query->limit(1000);
-//  $query->equalTo('secondWave', $ivrDate);
-//  $query->equalTo('ivrAllowed', true);
-//  $query->equalTo('ivrRecordFile', true);
-//
-//  return $query->find();
-//}
-//
-///**
-// * Send IVR notify for each contact in event list
-// * @param $eventList
-// * @throws \Exception
-// */
-//public function notifyIVR($eventList)
-//{
-//  foreach ($eventList as $event) {
-//
-//  //change status that IVR started
-//  $event->set('eventStatus', $this->eventStatusListReverse[self::IVR_STARTED]);
-//  $event->save();
-//
-//  //filter contact. send only for not sent contacts
-//  $contactList = $this->getContactForEvent($event);
-//
-//  foreach ($contactList as $contact) {
-//
-//    $phone = $this->preparePhone($contact->get('phone'));
-//    if ($phone) {
-//
-//      //send ivr
-//      $response = $this->sendIVR($phone, $contact->getObjectId());
-//
-//      //update status
-//      $status = $response['success'] ? self::SMS_STATUS_SENT : self::SMS_STATUS_ERROR;
-//      $this->updateContactWaveStatus($contact, $status, 'ivr');
-//
-//      //write log
-//      $this->logSmsStatus($event, $contact, 'IVR', $phone, '', $status, $response['errorText'], $response['session']);
-//
-//    } else {
-//
-//    }
-//  }
-//
-//  //change status that IVR finished
-//  $event->set('eventStatus', $this->eventStatusListReverse[self::IVR_DONE]);
-//  $event->save();
-//}
-//}
