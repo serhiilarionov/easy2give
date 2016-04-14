@@ -7,6 +7,7 @@ var express = require('express'),
   ChangesLog = mongoose.model('ChangesLog'),
   changesLogReferences = require('../../config/changesLogReferences.js'),
   locationReferences = require('../../config/locationReferences.js'),
+  parseServer = require('../../config/parseServer.js'),
   moment = require('moment'),
   url = require('../../config/url.js'),
   dateFormats = require('../../config/dateFormats.js');
@@ -35,7 +36,8 @@ router.get('/p', function (req, res, next) {
         'venueAddress': eventPlace.venueAddress,
         'venueLocationLatitude': eventPlace.venueLocation ? eventPlace.venueLocation[locationReferences.latitude] : '',
         'venueLocationLongitude': eventPlace.venueLocation ? eventPlace.venueLocation[locationReferences.longitude] : '',
-        //'venueLogo': eventPlace.venueLogo ? eventPlace.venueLogo.getUrl() : '',
+        'venueLogo': eventPlace.venueLogo ?
+        parseServer.filePath + parseServer.appId + '/' + eventPlace.venueLogo : '',
         'venueName': eventPlace.venueName,
         'venuePhone': eventPlace.venuePhone,
         'showBanner': showBanner

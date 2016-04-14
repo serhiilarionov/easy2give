@@ -10,6 +10,7 @@ var express = require('express'),
   cron = require('../services/cron.js'),
   moment = require('moment'),
   url = require('../../config/url.js'),
+  parseServer = require('../../config/parseServer.js'),
   DateLink = require('../services/dateLink.js'),
   dateFormats = require('../../config/dateFormats.js'),
   _ = require('lodash');
@@ -51,7 +52,8 @@ router.get('/c', function (req, res, next) {
         'contactName': contact.name,
         'brideName': event.brideName,
         'groomName': event.groomName,
-        //'image': event.image ? event.image.getUrl() : '',
+        'image': event.image ?
+        parseServer.filePath + parseServer.appId + '/' + event.image : '',
         'date': moment(event.date).format(dateFormats.confirmFormat),
         'dateLink': DateLink.getDateLink(event),
         'location': event.location,
@@ -97,7 +99,8 @@ router.get('/e', function (req, res, next) {
         'contactName': 'אורח',
         'brideName': event.brideName,
         'groomName': event.groomName,
-        //'image': event.image ? event.image.getUrl() : '',
+        'image': event.image ?
+        parseServer.filePath + parseServer.appId + '/' + event.image : '',
         'date': moment(event.date).format(dateFormats.confirmFormat),
         'dateLink': DateLink.getDateLink(event),
         'location': event.location,

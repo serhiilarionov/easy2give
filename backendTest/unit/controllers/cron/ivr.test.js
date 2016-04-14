@@ -13,6 +13,7 @@ var chai = require('chai'),
   app = express(),
   server;
 require('../../../../config/express')(app, config);
+chai.should();
 
 var IvrQueue = mongoose.model('IvrQueue'),
   Event = mongoose.model('Event'),
@@ -21,7 +22,6 @@ var IvrQueue = mongoose.model('IvrQueue'),
   ivrModule = require('../../../../app/controllers/cron/ivr.js');
 
 require('events').EventEmitter.prototype._maxListeners = 0;
-chai.should();
 
 describe('IVR controller', function() {
   before(function(done) {

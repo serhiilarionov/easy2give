@@ -3,6 +3,7 @@
 var Template = function() {
   var File = require('./file.js'),
     mongoose = require('mongoose-promised'),
+    _ = require('lodash'),
     ErrorLog = mongoose.model('Error');
 
   /**
@@ -18,6 +19,7 @@ var Template = function() {
           var re = new RegExp("%"+index+"%","g");
           template = template.replace(re, paramsList[index]);
         }
+        template = _.template(template)(paramsList);
         return template;
       })
       .catch(function(err) {

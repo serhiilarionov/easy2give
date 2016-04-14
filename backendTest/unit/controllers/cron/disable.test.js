@@ -56,7 +56,16 @@ describe('Disable controller', function() {
   });
 
   it('expect disable event by expiration date', function(done) {
-    disableModule.disable.byExpirationDate()
+    Event.where({
+      _id: TestData.EventLastWeek.id
+    }).findOneQ()
+      .then(function(event) {
+        event.paymentDone = true;
+        return event.saveQ();
+      })
+      .then(function() {
+        return disableModule.disable.byExpirationDate();
+      })
       .then(function(events) {
         expect(events).to.be.an('array');
         expect(events).to.have.length.above(0);
@@ -66,7 +75,16 @@ describe('Disable controller', function() {
   });
 
   it('expect disable event by not paid', function(done) {
-    disableModule.disable.byNotPaid()
+    Event.where({
+      _id: TestData.EventLastWeek.id
+    }).findOneQ()
+      .then(function(event) {
+        event.paymentDone = false;
+        return event.saveQ();
+      })
+      .then(function() {
+        return disableModule.disable.byNotPaid();
+      })
       .then(function(events) {
         expect(events).to.be.an('array');
         expect(events).to.have.length.above(0);

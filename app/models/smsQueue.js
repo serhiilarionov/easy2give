@@ -3,8 +3,7 @@
 var SmsQueue = function(){
   var moment = require('moment'),
     dateFormats = require('../../config/dateFormats.js'),
-    smsQueueReferences = require('../../config/smsQueueReferences.js'),
-    smsEventStateReferences = require('../../config/smsEventStateReferences.js'),
+    smsEventReferences = require('../../config/smsEventReferences.js'),
     mongoose = require('mongoose-promised'),
     url = require('../../config/url.js'),
     shortid = require('shortid'),
@@ -59,7 +58,7 @@ var SmsQueue = function(){
       .findOneQ()
       .then(function (sms){
         //don't change status if already delivered
-        if (!sms || sms.status == smsEventStateReferences.status['mt_del']) {
+        if (!sms || sms.status == smsEventReferences.status['mt_del']) {
           return false;
         }
 
@@ -67,10 +66,10 @@ var SmsQueue = function(){
         if (state == 'mt_ok') {
           return false;
         }
-        var text = smsEventStateReferences.message.hasOwnProperty(state) ?
-          smsEventStateReferences.message[state] : state;
-        var status = smsEventStateReferences.status.hasOwnProperty(state) ?
-          smsEventStateReferences.status[state] : state;
+        var text = smsEventReferences.message.hasOwnProperty(state) ?
+          smsEventReferences.message[state] : state;
+        var status = smsEventReferences.status.hasOwnProperty(state) ?
+          smsEventReferences.status[state] : state;
 
         sms.state = text;
         sms.reason = reason;

@@ -10,5 +10,11 @@ module.exports = {
     'mt_nok': '4',
     'mt_del': '5',
     'mt_rej': '6'
+  },
+  smsTextFields: {
+    'coupleAlert': 'coupleAlertText',
+    'firstWaveSms': 'firstWaveSmsText',
+    'secondWaveSms': 'secondWaveSmsText',
+    'smsRemind': 'smsRemindText'
   }
 };

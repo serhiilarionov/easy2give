@@ -4,11 +4,8 @@ var Event = function(){
   var moment = require('moment'),
     mongoose = require('mongoose-promised'),
     dateFormats = require('../../config/dateFormats.js'),
-    filePluginLib = require('mongoose-file'),
     path = require('path'),
     shortid = require('shortid'),
-    filePlugin = filePluginLib.filePlugin,
-    make_upload_to_model = filePluginLib.make_upload_to_model,
     Schema = mongoose.Schema;
 
   //scheme of Event model
@@ -39,6 +36,9 @@ var Event = function(){
     secondWave : {type: Date},
     ivrDate : {type: Date},
     disabledAt : {type: Date},
+    image : {type: String},
+    location: {type: String},
+    locationLink: {type: String},
     groomPhone : {type: String},
     bridePhone : {type: String},
     groomEmail : {type: String},
@@ -50,14 +50,6 @@ var Event = function(){
     password : {type: String, require: true},
     _created_at: {type: Date},
     _updated_at: {type: Date}
-  });
-
-  var uploads_base = path.join(__dirname, "uploads");
-  var uploads = path.join(uploads_base, "u");
-  EventScheme.plugin(filePlugin, {
-    name: "file",
-    upload_to: make_upload_to_model(uploads, 'file'),
-    relative_to: uploads_base
   });
 
   EventScheme.pre('save', function(next) {

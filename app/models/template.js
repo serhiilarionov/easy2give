@@ -114,6 +114,13 @@ var Template = function(){
       console.log(err);
     }
   });
+  _model.update({name: 'coupleCallCenterStarted'}, {
+    text : "שימו לב, טבלת המוזמנים עוברת לטלפניות לוידוא הגעה טלפוני."
+  }, {upsert: true}, function (err) {
+    if(err) {
+      console.log(err);
+    }
+  });
 
   return {
     schema : TemplateScheme,

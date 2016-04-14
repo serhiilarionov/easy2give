@@ -66,7 +66,7 @@ var testData = {
     date: lastWeek,
     firstWave: yesterday,
     secondWave: yesterday,
-    callCenter: yesterday,
+    callCenter: now,
     showBanner : true,
     smsRemind : true,
     smsRemindDate : now,

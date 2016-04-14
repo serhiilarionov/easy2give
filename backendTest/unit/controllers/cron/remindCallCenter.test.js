@@ -12,7 +12,6 @@ var chai = require('chai'),
   eventReferences = require('../../../../config/eventReferences.js'),
   TestData = require('../../testingData/testData.js'),
   callCenterModule = require('../../../../app/controllers/cron/remindCallCenter.js'),
-  smsQueueReferences = require('../../../../config/smsQueueReferences.js'),
   _ = require('lodash'),
   expect = require('chai').expect,
   app = express(),
@@ -62,6 +61,16 @@ describe('CallCenter controller', function() {
       .then(function(smsQueue) {
         expect(smsQueue[0]).to.be.an('array');
         expect(smsQueue[0]).to.have.length.above(0);
+        done();
+      })
+      .catch(done);
+  });
+
+  it('expect save sms about start call center', function(done) {
+    callCenterModule.callCenter.callCenterStarted()
+      .then(function(smsQueue) {
+        expect(smsQueue).to.be.an('array');
+        expect(smsQueue).to.have.length.above(0);
         done();
       })
       .catch(done);

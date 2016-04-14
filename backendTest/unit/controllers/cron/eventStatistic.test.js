@@ -1,14 +1,14 @@
 'use strict';
 
 var mongoose = require('mongoose-promised'),
-  TestData = require('../testingData/testData.js'),
-  Event = require('../../../app/models/event.js'),
-  Contact = require('../../../app/models/contact.js'),
-  SmsQueue = require('../../../app/models/smsQueue.js'),
-  smsEventReferences = require('../../../config/smsEventReferences.js'),
+  TestData = require('../../testingData/testData.js'),
+  Event = require('../../../../app/models/event.js'),
+  Contact = require('../../../../app/models/contact.js'),
+  SmsQueue = require('../../../../app/models/smsQueue.js'),
+  eventStatistic = require('../../../../app/controllers/cron/eventStatistic.js'),
   expect = require('chai').expect;
 
-describe('SmsQueue model', function () {
+describe('EventStatistic controller', function () {
   before(function(done) {
     mongoose.connectQ(TestData.dbPath)
       .then(function() {
@@ -32,33 +32,13 @@ describe('SmsQueue model', function () {
       });
   });
 
-  it('expect return the smsQueue', function (done) {
-    SmsQueue.model
-      .where({
-       _id: TestData.SmsQueue.id
-      })
-      .findOneQ()
-      .then(function (smsQueue) {
-        expect(smsQueue).to.be.an('object');
-        expect(smsQueue.status).to.equal(TestData.SmsQueue.status);
+  it('expect send sms statistic', function (done) {
+    eventStatistic.send.statistic()
+      .then(function (res) {
+        expect(res).to.be.true;
         done();
       })
       .catch(done);
-  });
-
-  it('expect update sms status', function (done) {
-    var _SmsQueue = new SmsQueue.model();
-    _SmsQueue
-      .updateStatus(TestData.smsSession, TestData.smsState, TestData.smsReason)
-      .then(function (sms) {
-        expect(sms).to.be.an('array');
-        expect(sms[0]).to.be.an('object');
-        expect(sms[0].status).to.be.equal(parseInt(smsEventReferences.status[TestData.smsState]));
-        done();
-      })
-      .catch(function(err) {
-        done(err);
-      });
   });
 
   after(function(done) {

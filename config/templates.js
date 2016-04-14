@@ -5,6 +5,7 @@ module.exports = {
   IVR: 'IVR',
   callCenter: 'callCenter',
   coupleAlertText: 'coupleAlertText',
-  instruction: 'instruction'
+  instruction: 'instruction',
+  coupleCallCenterStarted: 'coupleCallCenterStarted'
 };
 

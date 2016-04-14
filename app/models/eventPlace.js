@@ -18,7 +18,7 @@ var EventPlace = function(){
     },
     venueAddress: {type: String},
     venueLocation : { type: [Number], index: '2dsphere'},
-    venueLogo : { data: Buffer, contentType: String },
+    venueLogo : { type: String },
     venueName : {type: String},
     venuePhone : {type: String},
     _created_at: {type: Date},
