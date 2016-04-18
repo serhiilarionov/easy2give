@@ -15,17 +15,12 @@ var yesterday = moment().subtract('1', 'd').format(dateFormats.format);
 var twoDaysAgo = moment().subtract('2', 'd').format(dateFormats.format);
 var threeDaysAgo = moment().subtract('3', 'd').format(dateFormats.format);
 var lastWeek = moment().subtract('7', 'd').format(dateFormats.format);
-var testImg = {
-  //data: fs.readFileSync(process.env.PWD + '/www/easy2give/public/img/logo.png'),
-  contentType: 'image/png'
-  };
 
 var testData = {
   now: now,
   url: 'http://localhost:3000',
   apiUrl: 'http://localhost:3000/api',
-  //dbPath: 'mongodb://localhost:27017/easy2give-development',
-  dbPath: 'mongodb://188.166.89.130:27017/easy2give-test',
+  dbPath: 'mongodb://localhost:27017/easy2give-test',
   Event: {
     coupleId: 'test',
     password: 'test',
@@ -101,8 +96,7 @@ var testData = {
     venueName: 'test',
     venueAddress: '234234234',
     venuePhone: '123',
-    venueLocation: [23, 24],
-    venueLogo: testImg
+    venueLocation: [23, 24]
   },
   Contact: {
     status: 1,

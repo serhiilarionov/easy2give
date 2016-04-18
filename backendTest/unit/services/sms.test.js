@@ -31,7 +31,7 @@ describe('Sms service', function () {
       })
       .then(function(res){
         expect(res).to.be.a('object');
-        expect(res).to.have.all.keys('DESCRIPTION', 'RESULT');
+        expect(res).to.have.all.keys('SESSION', 'RESULT', 'OPTIONAL');
         done();
       })
       .catch(done);
