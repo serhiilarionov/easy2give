@@ -21,7 +21,7 @@ var ivr = function () {
    * @returns {Promise.<T>}
    */
   var notifyIVR = function() {
-    var expirationDate = moment().subtract('3', 'd').format(dateFormats.format);
+    var expirationDate = moment().subtract('3', 'hours').format(dateFormats.format);
     var where = {};
     where['secondWave'] = expirationDate;
     where['ivrAllowed'] = true;
@@ -94,35 +94,25 @@ var ivr = function () {
                   if (response) {
                     item.state = response;
                     item.status = ivrQueueReferences.send;
-                    item.save();
-                    return {
-                      ivr: item
-                    }
+                    return item.saveQ();
                   }
                 })
-            )
-          });
-
-          //handling all responses
-          return Promise.each(portionPromises, function(promise) {
-            if (promise) {
-              return Event.where({
-                _id: promise.ivr.event
-              }).findOneQ()
+                .then(function() {
+                  return Event.where({
+                    _id: item.event
+                  }).findOneQ()
+                })
                 .then(function(event) {
                   //change the status of event to the wave ended
                   event.eventStatus = (_.invert(eventReferences.eventStatuses))
                     [eventReferences.eventWavesTypes['IVR'][eventReferences.waveStatus.end]];
                   return event.saveQ();
                 })
-                .catch(function(err) {
-                  File.writeToFile('/error.log', err.message);
-                })
-            }
-          })
-          .catch(function(err) {
-            File.writeToFile('/error.log', err.message);
-          })
+            )
+          });
+
+          //handling all responses
+          return Promise.all(portionPromises);
         });
       });
   };

@@ -44,32 +44,23 @@ var send = function () {
                   item.session = response.SESSION;
                   item.status = smsQueueReferences.sentToService;
                   item.save();
-                  return {
-                    smsModel: item
+                  return Event.where({
+                    _id: item.event
+                  }).findOneQ()
+                })
+                .then(function(event) {
+                  //change the status of event to the wave ended
+                  if(item.waveType) {
+                    event.eventStatus = (_.invert(eventReferences.eventStatuses))
+                      [eventReferences.eventWavesTypes[item.waveType][eventReferences.waveStatus.end]];
+                    return event.saveQ();
                   }
                 })
             )
           });
 
           //handling all responses
-          return Promise.each(portionPromises, function(promise) {
-            if(promise) {
-              return Event.where({
-                _id: promise.smsModel.event
-              }).findOneQ()
-                .then(function(event) {
-                  //change the status of event to the wave ended
-                  if(promise.smsModel.waveType) {
-                    event.eventStatus = (_.invert(eventReferences.eventStatuses))
-                      [eventReferences.eventWavesTypes[promise.smsModel.waveType][eventReferences.waveStatus.end]];
-                    return event.saveQ();
-                  }
-                })
-            }
-          })
-          .catch(function(err) {
-            File.writeToFile('/error.log', err.message);
-          })
+          return Promise.all(portionPromises);
         });
       });
   };

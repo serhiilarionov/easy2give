@@ -44,7 +44,7 @@ var Contact = function(){
    */
   ContactScheme.methods.getContactForEvent = function getContactForEvent(event) {
     return this.model('Contact').where({
-      $or: [{event: event}, {_p_event: 'Event$' + event}],
+      $or: [{event: event.id}, {_p_event: 'Event$' + event.id}],
       status: {
         $in: [
           contactReferences.statusNotResponded,
