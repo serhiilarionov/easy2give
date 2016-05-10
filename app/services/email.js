@@ -5,7 +5,8 @@ var Email = function() {
     emailConfig = require('../../config/email.js'),
     url = require('../../config/url.js'),
     moment = require('moment'),
-    nodemailer = require('nodemailer'),
+    mandrill = require('mandrill-api/mandrill'),
+    mandrill_client = new mandrill.Mandrill(emailConfig.mandrillApiKey),
     mongoose = require('mongoose-promised'),
     ErrorLog = mongoose.model('Error'),
     Template = require('../services/template.js'),
@@ -25,17 +26,43 @@ var Email = function() {
     //get template for sending
     return Template.getTemplate(filePath, url)
       .then(function(html) {
-        // create reusable transporter object and promisify him
-        var transporter = Promise.promisifyAll(nodemailer.createTransport(emailConfig.transport));
-        // setup e-mail data with unicode symbols
-        var mailOptions = {
-          from: emailConfig.from, // sender address
-          to: emailList, // list of receivers
-          subject: subject, // Subject line
-          html: html // html body
+        var message = {
+          'html': html,
+          'subject': subject,
+          'from_email': emailConfig.fromEmail,
+          'from_name': emailConfig.fromName
         };
 
-        return transporter.sendMail(mailOptions);
+        //add email list
+        emailList.forEach(function(to) {
+          if (!to) {
+            return;
+          }
+          if(!message['to']) {
+            message['to'] = [];
+          }
+          message['to'].push({
+            'email': to,
+            'type': 'to'
+          })
+        });
+
+        //stop if email list is empty
+        if (!message['to'].length) {
+          return false;
+        }
+
+        var async = false;
+
+        return new Promise(function (resolve, reject) {
+          mandrill_client.messages.send({"message": message, "async": async}, function(result) {
+            resolve(result);
+          }, function(e) {
+            // Mandrill returns the error as an object with name and message keys
+            reject('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+          });
+        });
+
       })
       .then(function(res) {
         var message = moment().format() + ': ' + res.response;

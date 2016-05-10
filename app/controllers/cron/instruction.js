@@ -39,7 +39,6 @@ var instruction = function () {
               event.groomEmail,
               event.brideEmail
             ];
-            emailList = emailList.toString();
             //send email
             promises.push(Email.send(filePath, subject, emailList, paramsList)
               .then(function() {

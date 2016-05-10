@@ -9,6 +9,7 @@ var express = require('express'),
   dateFormats = require('../../../config/dateFormats.js'),
   eventReferences = require('../../../config/eventReferences.js'),
   Email = require('../../services/email.js'),
+  SmsQueueService = require('../../services/smsQueue.js'),
   env = process.env.NODE_ENV || 'development';
 
 var paidRemind = function () {
@@ -18,24 +19,16 @@ var paidRemind = function () {
    */
   var remindByNotPaid = function() {
     var expirationDate = moment().subtract(2, 'd').format(dateFormats.format);
+    var less = moment(expirationDate).add(1, 'm').format(dateFormats.format);
     return Event.where({
-      _created_at: expirationDate,
+      _created_at: {$lte: less, $gt: expirationDate},
       disabledAt: {$exists: false},
       paymentDone: {$ne: true}
     }).findQ()
       .then(function(events) {
         var promises = [];
         events.forEach(function(event) {
-          var filePath = './public/templates/email/remindNonPaymentEvent.html';
-          var subject = 'No payment was done on your account';
-          if(event.groomEmail || event.brideEmail) {
-            var emailList = [
-              event.groomEmail,
-              event.brideEmail
-            ];
-            emailList = emailList.toString();
-            promises.push(Email.send(filePath, subject, emailList, []))
-          }
+          promises.push(SmsQueueService.sendCoupleSms(event, 'coupleBeforeNonPaymentEvent'))
         });
 
         return Promise.all(promises);

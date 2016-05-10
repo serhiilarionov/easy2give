@@ -40,14 +40,12 @@ var send = function () {
             portionPromises.push(
               Sms.send(item.phone, item.smsText)
                 .then(function(response) {
-                  if(response.RESULT !== "False") {
-                    item.state = response.DESCRIPTION;
-                    item.session = response.SESSION;
-                    item.status = smsQueueReferences.sentToService;
-                    item.save();
-                    return {
-                      smsModel: item
-                    }
+                  item.state = response.DESCRIPTION || '';
+                  item.session = response.SESSION;
+                  item.status = smsQueueReferences.sentToService;
+                  item.save();
+                  return {
+                    smsModel: item
                   }
                 })
             )

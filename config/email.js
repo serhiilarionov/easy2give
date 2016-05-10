@@ -1,6 +1,7 @@
 module.exports = {
-  'from': '"Easy2give" <info@easy2give.co.il>',
-  'transport': 'smtps://serhiilarionov%40gmail.com:1rTcwet0_@smtp.gmail.com',
+  'fromEmail': 'info@easy2give.co.il',
+  'fromName': 'Easy2give',
+  'mandrillApiKey': '7NP3QVsNhHLKpwmv9oNvWg',
   'adminEmail': [
     'serhiilarionov@gmail.com'
   ],
