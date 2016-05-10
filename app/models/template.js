@@ -66,7 +66,7 @@ var Template = function(){
     }
   });
   _model.update({name: 'firstWave'}, {
-    text: "שימו לב, גל הסמסים השני יוצא לדרך."
+    text: "שימו לב, גל הסמסים הראשון יוצא לדרך."
   }, {upsert: true}, function (err) {
     if(err) {
       console.log(err);
