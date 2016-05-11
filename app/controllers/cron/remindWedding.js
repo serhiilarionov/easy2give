@@ -40,7 +40,7 @@ var remind = function () {
         return Promise.each(contactsPromises, function(promise) {
           promise.contacts.forEach(function(contact) {
             var sms = {};
-            sms.event = contact.event;
+            sms.event = promise.event.id;
             sms.contact = contact.id;
             sms.status = smsQueueReferences.wait;
             sms.smsText = promise.event.smsRemindText;
