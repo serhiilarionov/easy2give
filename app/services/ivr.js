@@ -17,7 +17,7 @@ var Ivr = function() {
     querystring = require("querystring"),
     Promise = require('bluebird');
 
-  const RECORD_PATH = '/ivr/mp3/';
+  const RECORD_PATH = ':3000/ivr/mp3/';
   const RECORD_NAME = 'record.mp3';
   /**
    * Save response from IVR service

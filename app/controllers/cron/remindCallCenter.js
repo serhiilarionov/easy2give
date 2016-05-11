@@ -18,10 +18,10 @@ var callCenter = function () {
    * @returns {*|Promise.<T>}
    */
   var coupleRemindCallCenter = function() {
-    var expirationDate = moment().subtract(1, 'd').format(dateFormats.format);
+    var expirationDate = moment().subtract(14, 'd').format(dateFormats.format);
 
     return Event.where({
-      secondWave: expirationDate,
+      date: expirationDate,
       callRSVP: true,
       callCenter: {$exists: true, $ne: null}
     }).findQ()

@@ -121,6 +121,13 @@ var Template = function(){
       console.log(err);
     }
   });
+  _model.update({name: 'eventApprovalFinished'}, {
+    text : "תהליך וידוא ההגעה הסתיים, שימו לב לאשר אישית עם המוזמנים שלא ענו."
+  }, {upsert: true}, function (err) {
+    if(err) {
+      console.log(err);
+    }
+  });
 
   return {
     schema : TemplateScheme,
