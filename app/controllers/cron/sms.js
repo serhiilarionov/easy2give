@@ -50,7 +50,9 @@ var send = function () {
                 })
                 .then(function(event) {
                   //change the status of event to the wave ended
-                  if(event && item.waveType) {
+                  var eventStatus = _.invert(eventReferences.eventStatuses)
+                    [eventReferences.eventWavesTypes[item.waveType]];
+                  if(event && eventStatus) {
                     event.eventStatus = (_.invert(eventReferences.eventStatuses))
                       [eventReferences.eventWavesTypes[item.waveType][eventReferences.waveStatus.end]];
                     return event.saveQ();

@@ -31,7 +31,7 @@ var smsQueue = function() {
           phone = event[phoneItem];
           if (phone) {
             var sms = {};
-            sms.event = event.objectId;
+            sms.event = event.id;
             sms.waveType = waveType;
             sms.status = smsQueueReferences.wait;
             sms.smsText = content;

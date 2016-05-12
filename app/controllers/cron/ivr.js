@@ -104,9 +104,11 @@ var ivr = function () {
                 })
                 .then(function(event) {
                   //change the status of event to the wave ended
-                  event.eventStatus = (_.invert(eventReferences.eventStatuses))
-                    [eventReferences.eventWavesTypes['IVR'][eventReferences.waveStatus.end]];
-                  return event.saveQ();
+                  if(event) {
+                    event.eventStatus = (_.invert(eventReferences.eventStatuses))
+                      [eventReferences.eventWavesTypes['IVR'][eventReferences.waveStatus.end]];
+                    return event.saveQ();
+                  }
                 })
             )
           });
