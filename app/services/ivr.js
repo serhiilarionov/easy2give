@@ -82,8 +82,10 @@ var Ivr = function() {
       _id: contactId
     }).findOneQ()
       .then(function(contact) {
+        var eventId = contact.toObject()._p_event ?
+          contact.toObject()._p_event.split("$")[1] : contact.event;
         return Event.where({
-          _id: contact.event,
+          _id: eventId,
           ivrRecordFile: {$exists: true, $ne: null}
         }).findOneQ()
       })

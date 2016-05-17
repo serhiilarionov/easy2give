@@ -107,8 +107,8 @@ var ivr = function () {
                   if(event) {
                     event.eventStatus = (_.invert(eventReferences.eventStatuses))
                       [eventReferences.eventWavesTypes['IVR'][eventReferences.waveStatus.end]];
-                    return event.saveQ();
                   }
+                  return event.saveQ();
                 })
             )
           });

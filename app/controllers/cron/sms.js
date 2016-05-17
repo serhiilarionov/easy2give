@@ -55,8 +55,8 @@ var send = function () {
                   if(event && eventStatus) {
                     event.eventStatus = (_.invert(eventReferences.eventStatuses))
                       [eventReferences.eventWavesTypes[item.waveType][eventReferences.waveStatus.end]];
-                    return event.saveQ();
                   }
+                  return event.saveQ();
                 })
             )
           });
